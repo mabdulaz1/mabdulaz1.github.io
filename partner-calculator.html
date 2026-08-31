@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ciao Mobility | Partner Fare Calculator</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="stylesheet" href="style.css">
+<style>
+.calc-wrap{min-height:100vh;background:var(--cream);padding:120px 7vw 70px}.calc-card{max-width:980px;margin:auto;background:#fff;padding:48px;box-shadow:0 20px 60px rgba(7,21,34,.08)}.calc-head{margin-bottom:34px}.calc-head h1{font-family:'Playfair Display',serif;font-size:clamp(40px,5vw,64px);font-weight:500;line-height:1.05;margin:0 0 12px}.calc-head h1 span{color:var(--gold)}.calc-head p{color:#59656d;max-width:680px}.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.calc-field label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}.calc-field input,.calc-field select{width:100%;padding:14px;border:1px solid #d2d6d8;background:#faf9f5;font:inherit;color:var(--navy)}.calc-actions{margin-top:25px;display:flex;gap:12px;align-items:center}.calc-result{margin-top:34px;border-top:2px solid var(--gold);padding-top:30px;display:none}.calc-result.show{display:block}.route-summary{color:#59656d;margin-bottom:24px}.fare-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.fare-box{border:1px solid #e0e2e3;padding:22px}.fare-box small{display:block;color:#68737a;font-size:11px;letter-spacing:1px;text-transform:uppercase}.fare-box strong{display:block;font-size:30px;margin:6px 0;color:var(--navy)}.fare-box.highlight{border:2px solid var(--gold);background:#fffaf0}.fare-box.highlight strong{color:#8c6c2f}.note{margin-top:20px;color:#68737a;font-size:12px}.back{position:absolute;top:25px;left:7vw;color:#fff}.topbar{position:absolute;top:0;left:0;right:0;height:82px;background:var(--navy);display:flex;align-items:center;padding:0 7vw}.topbar .brand strong,.topbar .brand span{display:block}.topbar .brand strong{font-size:22px;letter-spacing:4px;color:#fff}.topbar .brand span{font-size:9px;letter-spacing:4px;color:var(--gold)}
+@media(max-width:700px){.calc-card{padding:28px}.calc-grid,.fare-grid{grid-template-columns:1fr}.calc-wrap{padding:100px 5vw 50px}}
+</style>
+</head>
+<body>
+<header class="topbar"><a class="brand" href="/" aria-label="Ciao Mobility home"><strong>CIAO</strong><span>MOBILITY</span></a></header>
+<main class="calc-wrap"><section class="calc-card">
+<div class="calc-head"><p class="eyebrow">PRIVATE PARTNER TOOL</p><h1>Ciao Mobility<br><span>Fare Calculator</span></h1><p>Internal quotation tool for Ciao's B2B partners. Enter the pickup and destination to calculate the route, then apply Ciao's standard partner discount.</p></div>
+<div class="calc-grid">
+<div class="calc-field"><label for="pickup">Pickup location</label><input id="pickup" placeholder="e.g. Dubai International Airport Terminal 3"></div>
+<div class="calc-field"><label for="dropoff">Drop-off location</label><input id="dropoff" placeholder="e.g. Atlantis The Palm, Dubai"></div>
+<div class="calc-field"><label for="vehicle">Vehicle category</label><select id="vehicle"><option value="standard">Standard</option><option value="premium">Premium</option><option value="suv">Premium SUV</option></select></div>
+<div class="calc-field"><label for="discount">Partner discount</label><input id="discount" type="number" min="0" max="100" value="20"> </div>
+</div>
+<div class="calc-actions"><button class="button primary" id="calculate">Calculate Fare</button><span id="status" class="note"></span></div>
+<div class="calc-result" id="result">
+<div class="route-summary" id="route"></div>
+<div class="fare-grid"><div class="fare-box"><small>Route distance</small><strong id="distance">—</strong><span>Estimated driving distance</span></div><div class="fare-box"><small>Reference Ciao fare</small><strong id="reference">AED —</strong><span>Before partner discount</span></div><div class="fare-box highlight"><small>Partner fare</small><strong id="final">AED —</strong><span id="discountText">20% partner discount</span></div></div>
+<p class="note">Fare is calculated from Ciao's configured internal rate card. It is a quotation estimate and not a live Uber, Careem or Bolt fare.</p>
+</div>
+</section></main>
+<script>
+const RATE_CARD={standard:{base:0,perKm:0},premium:{base:0,perKm:0},suv:{base:0,perKm:0}};
+const $=id=>document.getElementById(id);
+async function geocode(q){const u='https://nominatim.openstreetmap.org/search?format=jsonv2&limit=1&countrycodes=ae&q='+encodeURIComponent(q);const r=await fetch(u,{headers:{Accept:'application/json'}});if(!r.ok)throw new Error('Location search failed');const d=await r.json();if(!d.length)throw new Error('Location not found: '+q);return [Number(d[0].lon),Number(d[0].lat)];}
+async function route(a,b){const u=`https://router.project-osrm.org/route/v1/driving/${a[0]},${a[1]};${b[0]},${b[1]}?overview=false`;const r=await fetch(u);if(!r.ok)throw new Error('Route service unavailable');const d=await r.json();if(d.code!=='Ok'||!d.routes?.length)throw new Error('Could not calculate driving route');return d.routes[0].distance/1000;}
+$('calculate').onclick=async()=>{const p=$('pickup').value.trim(),d=$('dropoff').value.trim(),v=$('vehicle').value,disc=Number($('discount').value)||0;if(!p||!d){$('status').textContent='Please enter both locations.';return}$('status').textContent='Calculating route…';$('calculate').disabled=true;try{const [a,b]=await Promise.all([geocode(p),geocode(d)]);const km=await route(a,b);const rate=RATE_CARD[v];if(rate.base===0&&rate.perKm===0){$('status').textContent='Route found. Ciao rate card still needs to be configured.';$('result').classList.add('show');$('route').textContent=`${p} → ${d}`;$('distance').textContent=km.toFixed(1)+' km';$('reference').textContent='Not configured';$('final').textContent='Not configured';$('discountText').textContent=disc+'% partner discount';return}const ref=rate.base+(km*rate.perKm),final=ref*(1-disc/100);$('status').textContent='';$('result').classList.add('show');$('route').textContent=`${p} → ${d}`;$('distance').textContent=km.toFixed(1)+' km';$('reference').textContent='AED '+ref.toFixed(2);$('final').textContent='AED '+final.toFixed(2);$('discountText').textContent=disc+'% partner discount';}catch(e){$('status').textContent=e.message}finally{$('calculate').disabled=false}};
+</script>
+</body></html>
