@@ -1,0 +1,4 @@
+/* Final chauffeur image edge cleanup: hide the thin white strip on the left without changing the approved photo */
+.photo-chauffeur{position:relative;}
+.photo-chauffeur::before{content:'';position:absolute;left:0;top:0;bottom:0;width:18px;background:#071522;z-index:1;pointer-events:none;}
+.photo-chauffeur>div{z-index:2;}
