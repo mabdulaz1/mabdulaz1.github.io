@@ -13,5 +13,5 @@
 /* Fleet image: show the complete approved collage without cropping or zooming */
 .photo-fleet{background-size:contain;background-position:center;background-repeat:no-repeat;background-color:#071522}
 
-/* Remove the thin white strips baked into the Fleet collage */
-.photo-fleet{background-image:linear-gradient(90deg,#071522 0 3px,transparent 3px calc(50% - 3px),#071522 calc(50% - 3px) calc(50% + 3px),transparent calc(50% + 3px) calc(100% - 3px),#071522 calc(100% - 3px) 100%),linear-gradient(90deg,rgba(7,21,34,.12),rgba(7,21,34,.15)),url('assets/fleet.jpg')}
+/* Fleet collage: clean vertical and horizontal center seams with matching Ciao background */
+.photo-fleet{background-image:linear-gradient(90deg,#071522 0 8px,transparent 8px calc(50% - 4px),#071522 calc(50% - 4px) calc(50% + 4px),transparent calc(50% + 4px) calc(100% - 8px),#071522 calc(100% - 8px) 100%),linear-gradient(0deg,transparent calc(50% - 4px),#071522 calc(50% - 4px) calc(50% + 4px),transparent calc(50% + 4px)),linear-gradient(90deg,rgba(7,21,34,.12),rgba(7,21,34,.15)),url('assets/fleet.jpg')}
