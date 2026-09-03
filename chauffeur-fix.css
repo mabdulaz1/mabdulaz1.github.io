@@ -5,3 +5,6 @@
 
 /* Use the newly uploaded Global Vision PNG */
 .photo-vision{background-image:url('assets/global-vision.png') !important;}
+
+/* Keep the 24/7 support icon fully visible in the first-page highlights */
+.highlights div:last-child .highlight-icon{font-size:20px;letter-spacing:-1px;white-space:nowrap;overflow:visible;width:42px;}
