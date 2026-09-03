@@ -9,3 +9,6 @@
 .nav-cta,.primary{background:var(--gold-metallic);border-color:#e2bd63;color:#111!important}
 .button{border-color:#d2a74b}
 .card{border-top-color:#d2a74b}
+
+/* Fleet image: show the complete approved collage without cropping or zooming */
+.photo-fleet{background-size:contain;background-position:center;background-repeat:no-repeat;background-color:#071522}
