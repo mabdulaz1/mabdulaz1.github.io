@@ -30,18 +30,37 @@
   "telephone": "+971585698871",
   "address": {
     "@type": "PostalAddress",
+    "streetAddress": "Port Saeed",
     "addressLocality": "Dubai",
+    "addressRegion": "Dubai",
     "addressCountry": "AE"
   },
-  "areaServed": [
+  "openingHoursSpecification": [
     {
-      "@type": "City",
-      "name": "Dubai"
-    },
-    {
-      "@type": "Country",
-      "name": "United Arab Emirates"
+      "@type": "OpeningHoursSpecification",
+      "dayOfWeek": [
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+        "Sunday"
+      ],
+      "opens": "00:00",
+      "closes": "23:59"
     }
+  ],
+  "areaServed": [
+    {"@type": "City", "name": "Dubai"},
+    {"@type": "City", "name": "Abu Dhabi"},
+    {"@type": "City", "name": "Sharjah"},
+    {"@type": "City", "name": "Ajman"},
+    {"@type": "City", "name": "Ras Al Khaimah"},
+    {"@type": "City", "name": "Fujairah"},
+    {"@type": "City", "name": "Umm Al Quwain"},
+    {"@type": "City", "name": "Al Ain"},
+    {"@type": "Country", "name": "United Arab Emirates"}
   ],
   "hasOfferCatalog": {
     "@type": "OfferCatalog",
