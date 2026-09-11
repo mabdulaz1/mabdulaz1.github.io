@@ -25,3 +25,9 @@
 .core-services .card{min-height:285px;display:flex;flex-direction:column}
 .core-services .card .text-link{margin-top:auto;padding-top:18px}
 @media(max-width:850px){.core-services{grid-template-columns:1fr}}
+
+/* Phase 5: consistent local contact and trust signals */
+.footer-contact{display:flex;flex-direction:column;align-items:flex-start;gap:4px;font-style:normal;color:#b9c1c7;font-size:13px;line-height:1.5}
+.footer-contact a,.footer-contact span{font-size:13px}
+.footer-contact span{color:#b9c1c7}
+@media(max-width:850px){.footer-contact{align-items:flex-start}}
