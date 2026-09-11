@@ -1,18 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://ciaomobility.me/</loc>
-  </url>
-  <url>
-    <loc>https://ciaomobility.me/dubai-airport-transfers.html</loc>
-  </url>
-  <url>
-    <loc>https://ciaomobility.me/chauffeur-services-dubai.html</loc>
-  </url>
-  <url>
-    <loc>https://ciaomobility.me/corporate-mobility-dubai.html</loc>
-  </url>
-  <url>
-    <loc>https://ciaomobility.me/hotel-dmc-transfers-dubai.html</loc>
-  </url>
+  <url><loc>https://ciaomobility.me/</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/dubai-airport-transfers.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/dxb-airport-to-downtown-dubai-transfer.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/dxb-airport-to-dubai-marina-transfer.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/dubai-airport-to-abu-dhabi-transfer.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/chauffeur-services-dubai.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/inter-emirate-transfers-uae.html</loc><lastmod>2026-09-11</lastmod></url>
+  <url><loc>https://ciaomobility.me/corporate-mobility-dubai.html</loc><lastmod>2026-09-08</lastmod></url>
+  <url><loc>https://ciaomobility.me/hotel-dmc-transfers-dubai.html</loc><lastmod>2026-09-08</lastmod></url>
 </urlset>

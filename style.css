@@ -19,3 +19,9 @@
 /* Trim the white strip from the left edge of the existing chauffeur image only */
 .photo-chauffeur{background-position:center,center}
 .photo-chauffeur:before{content:'';position:absolute;left:0;top:0;width:12px;height:100%;background:#071522;z-index:3;pointer-events:none}
+
+/* Three primary Ciao Mobility services */
+.core-services{grid-template-columns:repeat(3,1fr)}
+.core-services .card{min-height:285px;display:flex;flex-direction:column}
+.core-services .card .text-link{margin-top:auto;padding-top:18px}
+@media(max-width:850px){.core-services{grid-template-columns:1fr}}
