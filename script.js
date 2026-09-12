@@ -5,18 +5,22 @@ function sendBooking(e){
   e.preventDefault();
   const v=id=>(document.getElementById(id)?.value||'').trim();
   const details=[
-    'Hello Ciao Mobility, I would like to request a transfer.',
+    'Hello Ciao Mobility, I would like to request a quotation.',
     '',
-    'Name: '+v('name'),
-    'Phone / WhatsApp: '+v('phone'),
-    'Email: '+v('email'),
-    'Passengers: '+v('passengers'),
+    'Service: '+v('service'),
     'Pickup: '+v('pickup'),
     'Drop-off: '+v('dropoff'),
     'Date: '+(v('date')||'To be confirmed'),
     'Time: '+(v('time')||'To be confirmed'),
+    'Passengers: '+v('passengers'),
+    'Luggage: '+(v('luggage')||'Not provided'),
+    'Flight number: '+(v('flight')||'Not applicable / not provided'),
     '',
-    'Additional details: '+(v('message')||'None')
+    'Name: '+v('name'),
+    'Phone / WhatsApp: '+v('phone'),
+    'Email: '+(v('email')||'Not provided'),
+    '',
+    'Additional requirements: '+(v('message')||'None')
   ];
   window.location.href='https://wa.me/971585698871?text='+encodeURIComponent(details.join('\n'));
   return false;
