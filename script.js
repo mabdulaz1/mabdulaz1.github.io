@@ -1,6 +1,26 @@
 document.querySelector('.menu-toggle')?.addEventListener('click',()=>document.querySelector('.nav')?.classList.toggle('open'));
 document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.nav')?.classList.remove('open')));
-function sendBooking(e){e.preventDefault();const v=id=>document.getElementById(id)?.value||'';const subject=encodeURIComponent('Ciao Mobility Transfer Request - '+v('name'));const body=encodeURIComponent(`Name: ${v('name')}\nPhone / WhatsApp: ${v('phone')}\nEmail: ${v('email')}\nPassengers: ${v('passengers')}\nPickup: ${v('pickup')}\nDrop-off: ${v('dropoff')}\nDate: ${v('date')}\nTime: ${v('time')}\n\nMessage:\n${v('message')}`);window.location.href=`mailto:contact@ciaomobility.me?subject=${subject}&body=${body}`;return false;}
+
+function sendBooking(e){
+  e.preventDefault();
+  const v=id=>(document.getElementById(id)?.value||'').trim();
+  const details=[
+    'Hello Ciao Mobility, I would like to request a transfer.',
+    '',
+    'Name: '+v('name'),
+    'Phone / WhatsApp: '+v('phone'),
+    'Email: '+v('email'),
+    'Passengers: '+v('passengers'),
+    'Pickup: '+v('pickup'),
+    'Drop-off: '+v('dropoff'),
+    'Date: '+(v('date')||'To be confirmed'),
+    'Time: '+(v('time')||'To be confirmed'),
+    '',
+    'Additional details: '+(v('message')||'None')
+  ];
+  window.location.href='https://wa.me/971585698871?text='+encodeURIComponent(details.join('\n'));
+  return false;
+}
 
 document.addEventListener('DOMContentLoaded',()=>{
   const logo='assets/ciao-logo.svg';

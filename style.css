@@ -31,3 +31,6 @@
 .footer-contact a,.footer-contact span{font-size:13px}
 .footer-contact span{color:#b9c1c7}
 @media(max-width:850px){.footer-contact{align-items:flex-start}}
+
+/* Phase 7: enquiry conversion */
+.form-note{margin:12px 0 0;color:#68737a;font-size:13px}
