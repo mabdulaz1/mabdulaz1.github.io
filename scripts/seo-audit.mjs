@@ -159,11 +159,12 @@ for (const path of paths) {
     if (!existsSync(resolve(root, target))) errors.push(`${path}: broken internal link to ${target}`);
     if (pathSet.has(target) && target !== path) inboundLinks.set(target, inboundLinks.get(target) + 1);
     if (pathSet.has(target) && target !== path) inboundSources.get(target).add(path);
-  for (const match of html.matchAll(/<a\\b[^>]*href="([^"]+)"[^>]*>([\\s\\S]*?)<\\/a>/gi)) {
-    const anchorText = match[2].replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\\s+/g, " ").trim();
+  }
+
+  for (const match of html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
+    const anchorText = match[2].replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
     if (!anchorText) errors.push(`${path}: link has no accessible anchor text`);
     if (/^(learn more|read more|click here|more details)$/i.test(anchorText)) errors.push(`${path}: weak generic anchor text "${anchorText}"`);
-  }
   }
 }
 
