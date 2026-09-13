@@ -139,6 +139,7 @@ for (const path of paths) {
     ];
     if (!business || business["@id"] !== `${siteOrigin}/#business`) errors.push("index.html: missing canonical LocalBusiness entity");
     if (business && (business.telephone !== "+971585698871" || business.email !== "contact@ciaomobility.me")) errors.push("index.html: LocalBusiness contact details are inconsistent");
+    if (business?.openingHours || business?.openingHoursSpecification) errors.push("index.html: unverified opening-hours claim in LocalBusiness schema");
     for (const profile of requiredProfiles) {
       if (!business?.sameAs?.includes(profile)) errors.push(`index.html: LocalBusiness sameAs is missing ${profile}`);
     }
