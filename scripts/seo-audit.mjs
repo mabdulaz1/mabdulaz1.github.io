@@ -6,6 +6,7 @@ const sitemapPath = resolve(root, "sitemap.xml");
 const sitemap = readFileSync(sitemapPath, "utf8");
 const robots = readFileSync(resolve(root, "robots.txt"), "utf8");
 const notFound = readFileSync(resolve(root, "404.html"), "utf8");
+const bookingScript = readFileSync(resolve(root, "script-v32.js"), "utf8");
 const siteOrigin = "https://ciaomobility.me";
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1].trim());
 const paths = urls.map((url) => {
@@ -129,6 +130,9 @@ if (!/<meta\s+name="robots"\s+content="noindex,follow"/i.test(notFound)) errors.
 if (/<link\s+rel="canonical"/i.test(notFound)) errors.push("404.html must not declare a canonical URL");
 if ((notFound.match(/<h1\b/gi) || []).length !== 1) errors.push("404.html must contain exactly one H1");
 if (!/<script\s+src="\/script-v32\.js"><\/script>/i.test(notFound)) errors.push("404.html must load the versioned booking script");
+
+if (!/width="180" height="90" decoding="async" fetchpriority="high"/i.test(bookingScript)) errors.push("booking script must preserve optimized header-logo attributes");
+if (!/width="190" height="95" loading="lazy" decoding="async"/i.test(bookingScript)) errors.push("booking script must preserve optimized footer-logo attributes");
 
 if (errors.length) {
   console.error(`SEO audit failed with ${errors.length} issue(s):\n- ${errors.join("\n- ")}`);

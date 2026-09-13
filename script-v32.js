@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded',()=>{
   prefillBookingContext();
   const logo='assets/ciao-logo.svg';
   const brand=document.querySelector('.brand');
-  if(brand){brand.innerHTML=`<img src="${logo}" alt="CIAO Mobility Services">`;brand.style.width='190px';brand.style.height='82px';brand.style.padding='0';brand.style.overflow='visible';const img=brand.querySelector('img');img.style.width='180px';img.style.height='90px';img.style.objectFit='contain';img.style.display='block';}
+  if(brand){brand.innerHTML=`<img src="${logo}" alt="CIAO Mobility Services" width="180" height="90" decoding="async" fetchpriority="high">`;brand.style.width='190px';brand.style.height='82px';brand.style.padding='0';brand.style.overflow='visible';const img=brand.querySelector('img');img.style.width='180px';img.style.height='90px';img.style.objectFit='contain';img.style.display='block';}
   const footerLogo=document.querySelector('footer > div:first-child');
-  if(footerLogo){footerLogo.innerHTML=`<img src="${logo}" alt="CIAO Mobility Services">`;const img=footerLogo.querySelector('img');img.style.width='190px';img.style.height='95px';img.style.objectFit='contain';img.style.display='block';}
+  if(footerLogo){footerLogo.innerHTML=`<img src="${logo}" alt="CIAO Mobility Services" width="190" height="95" loading="lazy" decoding="async">`;const img=footerLogo.querySelector('img');img.style.width='190px';img.style.height='95px';img.style.objectFit='contain';img.style.display='block';}
 });
