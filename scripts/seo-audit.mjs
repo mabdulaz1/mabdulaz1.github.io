@@ -59,6 +59,7 @@ for (const path of paths) {
   const title = html.match(/<title>([\s\S]*?)<\/title>/i)?.[1].trim() || "";
   const description = html.match(/<meta\s+name="description"\s+content="([^"]*)"/i)?.[1].trim() || "";
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1] || "";
+  const imageTags = [...html.matchAll(/<img\\b[^>]*>/gi)].map((match) => match[0]);
   const h1Count = (html.match(/<h1\b/gi) || []).length;
 
   if (!title) errors.push(`${path}: missing title`);
@@ -75,6 +76,15 @@ for (const path of paths) {
     errors.push(`${path}: canonical is "${canonical}", expected "${expectedCanonical(path)}"`);
   }
   if (h1Count !== 1) errors.push(`${path}: expected one H1, found ${h1Count}`);
+  for (const image of imageTags) {
+    if (!/\\balt\\s*=\\s*["'][^"']+["']/i.test(image)) errors.push(`scripts/seo-audit.mjs: image is missing meaningful alt text`);
+    if (!/\\bwidth\\s*=\\s*["']?\\d+/i.test(image) || !/\\bheight\\s*=\\s*["']?\\d+/i.test(image)) {
+      errors.push(`scripts/seo-audit.mjs: image is missing numeric width or height`);
+    }
+    if (!/\\bdecoding\\s*=\\s*["']async["']/i.test(image)) errors.push(`scripts/seo-audit.mjs: image must use decoding="async"`);
+  }
+  if (imageTags[0] && /\\bloading\\s*=\\s*["']lazy["']/i.test(imageTags[0])) errors.push(`scripts/seo-audit.mjs: above-the-fold header image must not be lazy-loaded`);
+  if (imageTags.length > 1 && !/\\bloading\\s*=\\s*["']lazy["']/i.test(imageTags.at(-1))) errors.push(`scripts/seo-audit.mjs: footer image must be lazy-loaded`);
   for (const claim of unsupportedClaims) {
     if (html.toLowerCase().includes(claim)) errors.push(`${path}: unsupported claim "${claim}"`);
   }
