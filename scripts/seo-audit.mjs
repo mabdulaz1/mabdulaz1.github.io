@@ -61,6 +61,14 @@ for (const path of paths) {
 
   if (!title) errors.push(`${path}: missing title`);
   if (!description) errors.push(`${path}: missing meta description`);
+  if (title && (title.length < 30 || title.length > 65)) errors.push(`${path}: title length ${title.length}, expected 30-65 characters`);
+  if (description && (description.length < 110 || description.length > 165)) errors.push(`${path}: meta description length ${description.length}, expected 110-165 characters`);
+  if (!/<html[^>]+lang="en"/i.test(html)) errors.push(`${path}: missing html lang="en"`);
+  if (!/<meta[^>]+name="viewport"/i.test(html)) errors.push(`${path}: missing viewport meta tag`);
+  for (const property of ["og:title", "og:description", "og:url", "og:image"]) {
+    if (!new RegExp(`property="${property}"`, "i").test(html)) errors.push(`${path}: missing ${property}`);
+  }
+  if (/script\.js(?:["?])/i.test(html)) errors.push(`${path}: references stale script.js instead of versioned booking script`);
   if (canonical !== expectedCanonical(path)) {
     errors.push(`${path}: canonical is "${canonical}", expected "${expectedCanonical(path)}"`);
   }
@@ -107,4 +115,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`SEO audit passed: ${paths.length} sitemap pages, unique metadata, valid canonicals and JSON-LD, no unsupported claims, broken links or orphan pages.`);
+console.log(`SEO audit passed: ${paths.length} sitemap pages, search-ready metadata, valid canonicals and JSON-LD, no unsupported claims, broken links or orphan pages.`);
