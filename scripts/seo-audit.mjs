@@ -18,6 +18,7 @@ const errors = [];
 const titles = new Map();
 const descriptions = new Map();
 const inboundLinks = new Map(paths.map((path) => [path, 0]));
+const inboundSources = new Map(paths.map((path) => [path, new Set()]));
 const unsupportedClaims = [
   "24/7 transfer enquiries",
   "accepts transfer enquiries 24/7",
@@ -157,6 +158,17 @@ for (const path of paths) {
     if (!target || !target.endsWith(".html")) continue;
     if (!existsSync(resolve(root, target))) errors.push(`${path}: broken internal link to ${target}`);
     if (pathSet.has(target) && target !== path) inboundLinks.set(target, inboundLinks.get(target) + 1);
+    if (pathSet.has(target) && target !== path) inboundSources.get(target).add(path);
+  }
+
+  for (const match of html.matchAll(/<a\b([^>]*)href="([^"]+)"([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const attributes = `${match[1]} ${match[3]}`;
+    const body = match[4];
+    const anchorText = body.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+    const hasAriaLabel = /\baria-label\s*=\s*["'][^"']+["']/i.test(attributes);
+    const hasImageAlt = /<img\b[^>]*\balt\s*=\s*["'][^"']+["']/i.test(body);
+    if (!anchorText && !hasAriaLabel && !hasImageAlt) errors.push(`${path}: link has no accessible anchor text`);
+    if (/^(learn more|read more|click here|more details)$/i.test(anchorText)) errors.push(`${path}: weak generic anchor text "${anchorText}"`);
   }
 }
 
@@ -168,6 +180,7 @@ for (const [description, group] of descriptions) {
 }
 for (const [path, count] of inboundLinks) {
   if (path !== "index.html" && count === 0) errors.push(`${path}: sitemap page has no internal inbound link`);
+  if (path !== "index.html" && inboundSources.get(path).size < 2) errors.push(`${path}: needs inbound links from at least two distinct indexed pages`);
 }
 if (new Set(urls).size !== urls.length) errors.push("sitemap.xml contains duplicate URLs");
 if (!/^User-agent:\s*\*/im.test(robots) || !/^Allow:\s*\/$/im.test(robots)) errors.push("robots.txt must allow public crawling");
