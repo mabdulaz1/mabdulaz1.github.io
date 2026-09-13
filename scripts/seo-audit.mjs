@@ -161,9 +161,13 @@ for (const path of paths) {
     if (pathSet.has(target) && target !== path) inboundSources.get(target).add(path);
   }
 
-  for (const match of html.matchAll(/<a\b[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi)) {
-    const anchorText = match[2].replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
-    if (!anchorText) errors.push(`${path}: link has no accessible anchor text`);
+  for (const match of html.matchAll(/<a\b([^>]*)href="([^"]+)"([^>]*)>([\s\S]*?)<\/a>/gi)) {
+    const attributes = `${match[1]} ${match[3]}`;
+    const body = match[4];
+    const anchorText = body.replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+    const hasAriaLabel = /\baria-label\s*=\s*["'][^"']+["']/i.test(attributes);
+    const hasImageAlt = /<img\b[^>]*\balt\s*=\s*["'][^"']+["']/i.test(body);
+    if (!anchorText && !hasAriaLabel && !hasImageAlt) errors.push(`${path}: link has no accessible anchor text`);
     if (/^(learn more|read more|click here|more details)$/i.test(anchorText)) errors.push(`${path}: weak generic anchor text "${anchorText}"`);
   }
 }
