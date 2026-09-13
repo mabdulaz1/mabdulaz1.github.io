@@ -4,6 +4,7 @@ document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>do
 function sendBooking(e){
   e.preventDefault();
   const v=id=>(document.getElementById(id)?.value||'').trim();
+  const attribution=getEnquiryAttribution();
   const details=[
     'Hello Ciao Mobility, I would like to request a quotation.',
     '',
@@ -22,11 +23,45 @@ function sendBooking(e){
     '',
     'Additional requirements: '+(v('message')||'None')
   ];
+  if(attribution)details.push('', 'Enquiry source: '+attribution);
   window.location.href='https://wa.me/971585698871?text='+encodeURIComponent(details.join('\n'));
   return false;
 }
 
+function safeSourceValue(value,maxLength=100){
+  return (value||'').replace(/[\r\n<>]/g,' ').replace(/\s+/g,' ').trim().slice(0,maxLength);
+}
 
+function captureBookingSource(){
+  try{
+    if(!sessionStorage.getItem('ciao_landing_page')){
+      sessionStorage.setItem('ciao_landing_page',safeSourceValue(window.location.pathname||'/',140));
+      const referrer=document.referrer?new URL(document.referrer):null;
+      if(referrer&&referrer.origin!==window.location.origin)sessionStorage.setItem('ciao_referrer',safeSourceValue(referrer.hostname));
+      const params=new URLSearchParams(window.location.search);
+      for(const key of ['utm_source','utm_medium','utm_campaign']){
+        const value=safeSourceValue(params.get(key));
+        if(value)sessionStorage.setItem('ciao_'+key,value);
+      }
+    }
+  }catch(_){}
+}
+
+function getEnquiryAttribution(){
+  try{
+    const labels=[
+      ['ciao_landing_page','Landing page'],
+      ['ciao_utm_source','Source'],
+      ['ciao_utm_medium','Medium'],
+      ['ciao_utm_campaign','Campaign'],
+      ['ciao_referrer','Referrer']
+    ];
+    return labels.map(([key,label])=>{
+      const value=safeSourceValue(sessionStorage.getItem(key),140);
+      return value?label+': '+value:'';
+    }).filter(Boolean).join(' | ');
+  }catch(_){return '';}
+}
 
 function routeLabel(value){
   const special={dxb:'DXB',dwc:'DWC',shj:'SHJ',auh:'AUH',jbr:'JBR'};
@@ -83,6 +118,7 @@ function prefillBookingContext(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+  captureBookingSource();
   prefillBookingContext();
   const logo='assets/ciao-logo.svg';
   const brand=document.querySelector('.brand');
