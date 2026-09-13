@@ -17,6 +17,8 @@ const pathSet = new Set(paths);
 const errors = [];
 const titles = new Map();
 const descriptions = new Map();
+const headings = new Map();
+const mainTrigrams = new Map();
 const inboundLinks = new Map(paths.map((path) => [path, 0]));
 const inboundSources = new Map(paths.map((path) => [path, new Set()]));
 const unsupportedClaims = [
@@ -63,6 +65,12 @@ for (const path of paths) {
   const canonical = html.match(/<link\s+rel="canonical"\s+href="([^"]+)"/i)?.[1] || "";
   const imageTags = [...html.matchAll(/<img\b[^>]*>/gi)].map((match) => match[0]);
   const h1Count = (html.match(/<h1\b/gi) || []).length;
+  const h1Text = (html.match(/<h1\b[^>]*>([\s\S]*?)<\/h1>/i)?.[1] || "").replace(/<[^>]+>/g, " ").replace(/&amp;/g, "&").replace(/\s+/g, " ").trim();
+  const mainText = (html.match(/<main\b[^>]*>([\s\S]*?)<\/main>/i)?.[1] || "").replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&[a-z#0-9]+;/gi, " ").replace(/[^a-z0-9]+/gi, " ").trim().toLowerCase();
+  const words = mainText.split(/\s+/).filter(Boolean);
+  const trigrams = new Set();
+  for (let index = 0; index + 2 < words.length; index += 1) trigrams.add(words.slice(index, index + 3).join(" "));
+  mainTrigrams.set(path, trigrams);
 
   if (!title) errors.push(`${path}: missing title`);
   if (!description) errors.push(`${path}: missing meta description`);
@@ -104,6 +112,7 @@ for (const path of paths) {
 
   addDuplicate(titles, title, path);
   addDuplicate(descriptions, description, path);
+  addDuplicate(headings, h1Text, path);
 
   for (const match of html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)) {
     try {
@@ -177,6 +186,20 @@ for (const [title, group] of titles) {
 }
 for (const [description, group] of descriptions) {
   if (group.length > 1) errors.push(`duplicate meta description on: ${group.join(", ")}`);
+}
+for (const [heading, group] of headings) {
+  if (group.length > 1) errors.push(`duplicate H1 "${heading}" on: ${group.join(", ")}`);
+}
+for (let left = 0; left < paths.length; left += 1) {
+  for (let right = left + 1; right < paths.length; right += 1) {
+    const first = mainTrigrams.get(paths[left]);
+    const second = mainTrigrams.get(paths[right]);
+    if (!first?.size || !second?.size) continue;
+    let intersection = 0;
+    for (const trigram of first) if (second.has(trigram)) intersection += 1;
+    const similarity = intersection / (first.size + second.size - intersection);
+    if (similarity >= 0.85) errors.push(`${paths[left]} and ${paths[right]} have ${(similarity * 100).toFixed(1)}% main-content overlap`);
+  }
 }
 for (const [path, count] of inboundLinks) {
   if (path !== "index.html" && count === 0) errors.push(`${path}: sitemap page has no internal inbound link`);
