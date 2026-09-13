@@ -29,6 +29,8 @@ const unsupportedClaims = [
   "vehicle monitoring",
   "emergency readiness",
   "trusted by leading brands",
+  "24/7 support",
+  "always here to assist",
 ];
 
 function addDuplicate(map, value, path) {
