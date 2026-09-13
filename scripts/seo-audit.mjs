@@ -69,13 +69,13 @@ for (const path of paths) {
   if (description && (description.length < 110 || description.length > 165)) errors.push(`${path}: meta description length ${description.length}, expected 110-165 characters`);
   if (!/<html[^>]+lang="en"/i.test(html)) errors.push(`${path}: missing html lang="en"`);
   if (!/<meta[^>]+name="viewport"/i.test(html)) errors.push(`${path}: missing viewport meta tag`);
-  if (!/<a\\s+class="skip-link"\\s+href="#main-content">Skip to main content<\\/a>/i.test(html)) errors.push(`${path}: missing keyboard skip link`);
-  if (!/<main\\s+id="main-content"/i.test(html)) errors.push(`${path}: main landmark must have the skip-link target`);
-  if (!/<nav\\s+class="nav"\\s+id="primary-navigation"/i.test(html)) errors.push(`${path}: primary navigation needs a stable accessible ID`);
-  if (!/<button\\s+class="menu-toggle"[^>]+type="button"[^>]+aria-label="Open menu"[^>]+aria-expanded="false"[^>]+aria-controls="primary-navigation"/i.test(html)) errors.push(`${path}: menu button is missing accessible state attributes`);
-  if (!/wa\\.me\\/971585698871/i.test(html)) errors.push(`${path}: missing WhatsApp enquiry path`);
-  if (!/href="tel:\\+971585698871"/i.test(html)) errors.push(`${path}: missing telephone enquiry path`);
-  if (!/href="mailto:contact@ciaomobility\\.me"/i.test(html)) errors.push(`${path}: missing email enquiry path`);
+  if (!/<a\s+class="skip-link"\s+href="#main-content">Skip to main content<\/a>/i.test(html)) errors.push(`${path}: missing keyboard skip link`);
+  if (!/<main\s+id="main-content"/i.test(html)) errors.push(`${path}: main landmark must have the skip-link target`);
+  if (!/<nav\s+class="nav"\s+id="primary-navigation"/i.test(html)) errors.push(`${path}: primary navigation needs a stable accessible ID`);
+  if (!/<button\s+class="menu-toggle"[^>]+type="button"[^>]+aria-label="Open menu"[^>]+aria-expanded="false"[^>]+aria-controls="primary-navigation"/i.test(html)) errors.push(`${path}: menu button is missing accessible state attributes`);
+  if (!/wa\.me\/971585698871/i.test(html)) errors.push(`${path}: missing WhatsApp enquiry path`);
+  if (!/href="tel:\+971585698871"/i.test(html)) errors.push(`${path}: missing telephone enquiry path`);
+  if (!/href="mailto:contact@ciaomobility\.me"/i.test(html)) errors.push(`${path}: missing email enquiry path`);
   for (const property of ["og:title", "og:description", "og:url", "og:image"]) {
     if (!new RegExp(`property="${property}"`, "i").test(html)) errors.push(`${path}: missing ${property}`);
   }
