@@ -26,7 +26,64 @@ function sendBooking(e){
   return false;
 }
 
+
+
+function routeLabel(value){
+  const special={dxb:'DXB',dwc:'DWC',shj:'SHJ',auh:'AUH',jbr:'JBR'};
+  return value.split('-').map(word=>special[word]||word.charAt(0).toUpperCase()+word.slice(1)).join(' ');
+}
+
+function inferJourneyContext(pathname){
+  const path=(pathname||'').replace(/^\//,'');
+  const airportOrigins=[
+    [/^dxb-airport-to-(.+)-transfer\.html$/,'Dubai International Airport (DXB)'],
+    [/^auh-airport-to-(.+)-transfer\.html$/,'Zayed International Airport (AUH)'],
+    [/^sharjah-airport-to-(.+)-transfer\.html$/,'Sharjah International Airport (SHJ)'],
+    [/^dwc-airport-to-(.+)-transfer\.html$/,'Al Maktoum International Airport (DWC)']
+  ];
+  for(const [pattern,pickup] of airportOrigins){
+    const match=path.match(pattern);
+    if(match)return {service:'Airport Transfer',pickup,dropoff:routeLabel(match[1])};
+  }
+  if(path==='dubai-airport-to-abu-dhabi-transfer.html')return {service:'Airport Transfer',pickup:'Dubai International Airport (DXB)',dropoff:'Abu Dhabi'};
+  if(path==='abu-dhabi-airport-to-dubai-transfer.html')return {service:'Airport Transfer',pickup:'Zayed International Airport (AUH)',dropoff:'Dubai'};
+  if(path==='dxb-to-dwc-airport-transfer.html')return {service:'Airport Transfer',pickup:'Dubai International Airport (DXB)',dropoff:'Al Maktoum International Airport (DWC)'};
+  if(path==='dxb-to-abu-dhabi-airport-transfer.html')return {service:'Airport Transfer',pickup:'Dubai International Airport (DXB)',dropoff:'Zayed International Airport (AUH)'};
+  if(path==='shj-to-dxb-airport-transfer.html')return {service:'Airport Transfer',pickup:'Sharjah International Airport (SHJ)',dropoff:'Dubai International Airport (DXB)'};
+  let match=path.match(/^dubai-to-(.+)-private-transfer\.html$/);
+  if(match)return {service:'Inter-Emirate Transfer',pickup:'Dubai',dropoff:routeLabel(match[1])};
+  if(path==='abu-dhabi-to-dubai-private-transfer.html')return {service:'Inter-Emirate Transfer',pickup:'Abu Dhabi',dropoff:'Dubai'};
+  if(/^chauffeur-service|^chauffeur-services|^hourly-full-day-chauffeur/.test(path))return {service:'Chauffeur Service'};
+  if(/airport/.test(path))return {service:'Airport Transfer'};
+  if(/inter-emirate/.test(path))return {service:'Inter-Emirate Transfer'};
+  return {};
+}
+
+function prefillBookingContext(){
+  const form=document.querySelector('.booking-form');
+  if(!form)return;
+  let context={};
+  try{
+    const referrer=new URL(document.referrer);
+    if(referrer.origin===window.location.origin)context=inferJourneyContext(referrer.pathname);
+  }catch(_){}
+  const params=new URLSearchParams(window.location.search);
+  const allowedServices=['Airport Transfer','Chauffeur Service','Inter-Emirate Transfer'];
+  const requestedService=params.get('service');
+  if(allowedServices.includes(requestedService))context.service=requestedService;
+  if(params.get('pickup'))context.pickup=params.get('pickup').slice(0,120);
+  if(params.get('dropoff'))context.dropoff=params.get('dropoff').slice(0,120);
+  for(const id of ['service','pickup','dropoff']){
+    const field=document.getElementById(id);
+    if(field&&context[id]&&!field.value)field.value=context[id];
+  }
+  const summary=[context.service,context.pickup&&context.dropoff?context.pickup+' → '+context.dropoff:context.pickup||context.dropoff].filter(Boolean).join(' · ');
+  const notice=document.getElementById('journey-context');
+  if(notice&&summary){notice.textContent='Journey selected: '+summary;notice.hidden=false;}
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
+  prefillBookingContext();
   const logo='assets/ciao-logo.svg';
   const brand=document.querySelector('.brand');
   if(brand){brand.innerHTML=`<img src="${logo}" alt="CIAO Mobility Services">`;brand.style.width='190px';brand.style.height='82px';brand.style.padding='0';brand.style.overflow='visible';const img=brand.querySelector('img');img.style.width='180px';img.style.height='90px';img.style.objectFit='contain';img.style.display='block';}
