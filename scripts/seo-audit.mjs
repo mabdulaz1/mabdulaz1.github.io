@@ -15,6 +15,15 @@ const errors = [];
 const titles = new Map();
 const descriptions = new Map();
 const inboundLinks = new Map(paths.map((path) => [path, 0]));
+const unsupportedClaims = [
+  "24/7 transfer enquiries",
+  "accepts transfer enquiries 24/7",
+  "on-time, every time",
+  "trained, licensed",
+  "vehicle monitoring",
+  "emergency readiness",
+  "trusted by leading brands",
+];
 
 function addDuplicate(map, value, path) {
   if (!value) return;
@@ -56,6 +65,9 @@ for (const path of paths) {
     errors.push(`${path}: canonical is "${canonical}", expected "${expectedCanonical(path)}"`);
   }
   if (h1Count !== 1) errors.push(`${path}: expected one H1, found ${h1Count}`);
+  for (const claim of unsupportedClaims) {
+    if (html.toLowerCase().includes(claim)) errors.push(`${path}: unsupported claim "${claim}"`);
+  }
   if (/noindex/i.test(html.match(/<meta\s+name="robots"[^>]*>/i)?.[0] || "")) {
     errors.push(`${path}: sitemap page contains noindex`);
   }
@@ -95,4 +107,4 @@ if (errors.length) {
   process.exit(1);
 }
 
-console.log(`SEO audit passed: ${paths.length} sitemap pages, unique metadata, valid canonicals and JSON-LD, no broken links or orphan pages.`);
+console.log(`SEO audit passed: ${paths.length} sitemap pages, unique metadata, valid canonicals and JSON-LD, no unsupported claims, broken links or orphan pages.`);
