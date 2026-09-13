@@ -105,7 +105,7 @@ for (const path of paths) {
     }
   }
 
-  const schemaNodes = [...html.matchAll(/<script\\s+type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/gi)].map((match) => JSON.parse(match[1]));
+  const schemaNodes = [...html.matchAll(/<script\s+type="application\/ld\+json">([\s\S]*?)<\/script>/gi)].map((match) => JSON.parse(match[1]));
   for (const node of schemaNodes) {
     if (node["@type"] === "Service") {
       if (node.url !== expectedCanonical(path)) errors.push(`${path}: Service schema URL must match canonical`);
