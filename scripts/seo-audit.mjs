@@ -4,6 +4,8 @@ import { resolve, dirname, basename } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const sitemapPath = resolve(root, "sitemap.xml");
 const sitemap = readFileSync(sitemapPath, "utf8");
+const robots = readFileSync(resolve(root, "robots.txt"), "utf8");
+const notFound = readFileSync(resolve(root, "404.html"), "utf8");
 const siteOrigin = "https://ciaomobility.me";
 const urls = [...sitemap.matchAll(/<loc>(.*?)<\/loc>/g)].map((match) => match[1].trim());
 const paths = urls.map((url) => {
@@ -109,10 +111,18 @@ for (const [path, count] of inboundLinks) {
   if (path !== "index.html" && count === 0) errors.push(`${path}: sitemap page has no internal inbound link`);
 }
 if (new Set(urls).size !== urls.length) errors.push("sitemap.xml contains duplicate URLs");
+if (!/^User-agent:\s*\*/im.test(robots) || !/^Allow:\s*\/$/im.test(robots)) errors.push("robots.txt must allow public crawling");
+if (!/^Sitemap:\s*https:\/\/ciaomobility\.me\/sitemap\.xml$/im.test(robots)) errors.push("robots.txt must advertise the canonical sitemap URL");
+if (urls.some((url) => !url.startsWith(`${siteOrigin}/`))) errors.push("sitemap.xml contains a URL outside the canonical origin");
+if (urls.some((url) => /\/404(?:\.html)?$/i.test(url))) errors.push("404 page must not appear in sitemap.xml");
+if (!/<meta\s+name="robots"\s+content="noindex,follow"/i.test(notFound)) errors.push("404.html must contain noindex,follow");
+if (/<link\s+rel="canonical"/i.test(notFound)) errors.push("404.html must not declare a canonical URL");
+if ((notFound.match(/<h1\b/gi) || []).length !== 1) errors.push("404.html must contain exactly one H1");
+if (!/<script\s+src="\/script-v32\.js"><\/script>/i.test(notFound)) errors.push("404.html must load the versioned booking script");
 
 if (errors.length) {
   console.error(`SEO audit failed with ${errors.length} issue(s):\n- ${errors.join("\n- ")}`);
   process.exit(1);
 }
 
-console.log(`SEO audit passed: ${paths.length} sitemap pages, search-ready metadata, valid canonicals and JSON-LD, no unsupported claims, broken links or orphan pages.`);
+console.log(`SEO audit passed: ${paths.length} sitemap pages, search-ready metadata, valid crawl controls, canonicals and JSON-LD, no unsupported claims, broken links or orphan pages.`);
