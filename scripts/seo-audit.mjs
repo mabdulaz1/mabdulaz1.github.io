@@ -105,6 +105,45 @@ for (const path of paths) {
     }
   }
 
+  const schemaNodes = [...html.matchAll(/<script\\s+type="application\\/ld\\+json">([\\s\\S]*?)<\\/script>/gi)].map((match) => JSON.parse(match[1]));
+  for (const node of schemaNodes) {
+    if (node["@type"] === "Service") {
+      if (node.url !== expectedCanonical(path)) errors.push(`${path}: Service schema URL must match canonical`);
+      if (node.provider?.["@id"] !== `${siteOrigin}/#business`) errors.push(`${path}: Service schema must reference the canonical business ID`);
+      for (const field of ["name", "description", "serviceType", "areaServed"]) {
+        if (!node[field] || (Array.isArray(node[field]) && node[field].length === 0)) errors.push(`${path}: Service schema is missing ${field}`);
+      }
+    }
+    if (node["@type"] === "BreadcrumbList") {
+      const items = node.itemListElement || [];
+      if (!items.length || items.some((item, index) => item.position !== index + 1)) errors.push(`${path}: breadcrumb positions must be sequential`);
+      if (items.at(-1)?.item !== expectedCanonical(path)) errors.push(`${path}: final breadcrumb URL must match canonical`);
+      for (const item of items) {
+        if (item.item && !urls.includes(item.item)) errors.push(`${path}: breadcrumb points outside the sitemap: ${item.item}`);
+      }
+    }
+    if (node["@type"] === "FAQPage") {
+      if (!Array.isArray(node.mainEntity) || !node.mainEntity.length) errors.push(`${path}: FAQ schema has no questions`);
+      for (const question of node.mainEntity || []) {
+        if (!question.name || !html.includes(question.name)) errors.push(`${path}: FAQ schema question is not visible on the page`);
+        const answer = question.acceptedAnswer?.text;
+        if (!answer || !html.includes(answer)) errors.push(`${path}: FAQ schema answer is not visible on the page`);
+      }
+    }
+  }
+  if (path === "index.html") {
+    const business = schemaNodes.find((node) => node["@type"] === "LocalBusiness");
+    const requiredProfiles = [
+      "https://www.tripadvisor.com/Attraction_Review-g295424-d34661546-Reviews-Dubai_Airport_Transfers-Dubai_Emirate_of_Dubai.html",
+      "https://www.viator.com/tours/Dubai/Premium-Airport-Transfer-Service/d828-5694165P1",
+    ];
+    if (!business || business["@id"] !== `${siteOrigin}/#business`) errors.push("index.html: missing canonical LocalBusiness entity");
+    if (business && (business.telephone !== "+971585698871" || business.email !== "contact@ciaomobility.me")) errors.push("index.html: LocalBusiness contact details are inconsistent");
+    for (const profile of requiredProfiles) {
+      if (!business?.sameAs?.includes(profile)) errors.push(`index.html: LocalBusiness sameAs is missing ${profile}`);
+    }
+  }
+
   for (const match of html.matchAll(/href="([^"]+)"/gi)) {
     const target = normalizeInternalHref(match[1], filePath);
     if (!target || !target.endsWith(".html")) continue;
