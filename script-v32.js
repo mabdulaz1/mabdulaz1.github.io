@@ -88,6 +88,7 @@ function inferJourneyContext(pathname){
   let match=path.match(/^dubai-to-(.+)-private-transfer\.html$/);
   if(match)return {service:'Inter-Emirate Transfer',pickup:'Dubai',dropoff:routeLabel(match[1])};
   if(path==='abu-dhabi-to-dubai-private-transfer.html')return {service:'Inter-Emirate Transfer',pickup:'Abu Dhabi',dropoff:'Dubai'};
+  if(path==='dubai-hotel-to-airport-transfer.html')return {service:'Airport Transfer',pickup:'Dubai hotel or address',dropoff:'Dubai airport (DXB or DWC)'};
   if(/^chauffeur-service|^chauffeur-services|^hourly-full-day-chauffeur/.test(path))return {service:'Chauffeur Service'};
   if(/airport/.test(path))return {service:'Airport Transfer'};
   if(/inter-emirate/.test(path))return {service:'Inter-Emirate Transfer'};
