@@ -73,6 +73,7 @@ for (const path of paths) {
     if (!new RegExp(`property="${property}"`, "i").test(html)) errors.push(`${path}: missing ${property}`);
   }
   if (/script\.js(?:["?])/i.test(html)) errors.push(`${path}: references stale script.js instead of versioned booking script`);
+  if (!/<script\s+src="\/?script-v32\.js\?v=42"><\/script>/i.test(html)) errors.push(`${path}: must load script-v32.js with the v=42 cache key`);
   if (canonical !== expectedCanonical(path)) {
     errors.push(`${path}: canonical is "${canonical}", expected "${expectedCanonical(path)}"`);
   }
@@ -129,7 +130,7 @@ if (urls.some((url) => /\/404(?:\.html)?$/i.test(url))) errors.push("404 page mu
 if (!/<meta\s+name="robots"\s+content="noindex,follow"/i.test(notFound)) errors.push("404.html must contain noindex,follow");
 if (/<link\s+rel="canonical"/i.test(notFound)) errors.push("404.html must not declare a canonical URL");
 if ((notFound.match(/<h1\b/gi) || []).length !== 1) errors.push("404.html must contain exactly one H1");
-if (!/<script\s+src="\/script-v32\.js"><\/script>/i.test(notFound)) errors.push("404.html must load the versioned booking script");
+if (!/<script\s+src="\/script-v32\.js\?v=42"><\/script>/i.test(notFound)) errors.push("404.html must load the versioned booking script");
 
 if (!/width="180" height="90" decoding="async" fetchpriority="high"/i.test(bookingScript)) errors.push("booking script must preserve optimized header-logo attributes");
 if (!/width="190" height="95" loading="lazy" decoding="async"/i.test(bookingScript)) errors.push("booking script must preserve optimized footer-logo attributes");
