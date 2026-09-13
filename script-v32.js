@@ -1,5 +1,9 @@
-document.querySelector('.menu-toggle')?.addEventListener('click',()=>document.querySelector('.nav')?.classList.toggle('open'));
-document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>document.querySelector('.nav')?.classList.remove('open')));
+const menuToggle=document.querySelector('.menu-toggle');
+const navigation=document.querySelector('.nav');
+const setMenuState=(open)=>{navigation?.classList.toggle('open',open);menuToggle?.setAttribute('aria-expanded',String(open));menuToggle?.setAttribute('aria-label',open?'Close menu':'Open menu');};
+menuToggle?.addEventListener('click',()=>setMenuState(!navigation?.classList.contains('open')));
+document.querySelectorAll('.nav a').forEach(a=>a.addEventListener('click',()=>setMenuState(false)));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&navigation?.classList.contains('open')){setMenuState(false);menuToggle?.focus();}});
 
 function sendBooking(e){
   e.preventDefault();
